@@ -1,60 +1,73 @@
 namespace YubPack.Roguelike {
     using Components;
     using UnityEngine;
+    using System;
     using System.Collections.Generic;
+    using Random = UnityEngine.Random;
 
     public class Mapmaker {
+        public Guid guid { get; private set; }
         private List<Node> nodes;
 
-        public Mapmaker(int ml = 10, int mw = 5) {
+        public int maxLayer { get; set; } = 10;
+        public int maxWidth { get; set; } = 5;
+
+        public Mapmaker() {
+            guid = Guid.NewGuid();
+            making();
+        }
+
+        public void making() {
+            Random.InitState(guid.GetHashCode());
+
             nodes = new List<Node>();
-            int[] numLayer = new int[ml];
+            int[] numLayer = new int[maxLayer];
             numLayer[0] = 1;
-            numLayer[ml - 1] = 1;
+            numLayer[maxLayer - 1] = 1;
 
             int i = 1;
-            while(numLayer[i - 1] < mw - 2 && i < ml / 2) {
+            while (numLayer[i - 1] < maxWidth - 2 && i < maxLayer / 2) {
                 int fL = numLayer[i - 1];
-                int nL = Random.Range(fL + 1, (fL + 3) < (mw + 1) ? (fL + 3) : (mw + 1));
+                int nL = Random.Range(fL + 1, (fL + 3) < (maxWidth + 1) ? (fL + 3) : (maxWidth + 1));
                 numLayer[i] = nL;
                 i++;
             }
 
-            int j = ml - 2;
-            while (numLayer[j + 1] < mw - 2 && j > ml / 2) {
+            int j = maxLayer - 2;
+            while (numLayer[j + 1] < maxWidth - 2 && j > maxLayer / 2) {
                 int fL = numLayer[j + 1];
-                int nL = Random.Range(fL + 1, (fL + 3) < (mw + 1) ? (fL + 3) : (mw + 1));
+                int nL = Random.Range(fL + 1, (fL + 3) < (maxWidth + 1) ? (fL + 3) : (maxWidth + 1));
                 numLayer[j] = nL;
                 j--;
             }
             j++;
 
             while (i < j) {
-                int nL = Random.Range(mw - 2, mw + 1);
+                int nL = Random.Range(maxWidth - 2, maxWidth + 1);
                 numLayer[i] = nL;
                 i++;
             }
 
             List<List<Node>> layerNodes = new List<List<Node>>();
-            for (i = 0; i < ml; i++) {
+            for (i = 0; i < maxLayer; i++) {
                 layerNodes.Add(new List<Node>());
-                for(j = 0; j < numLayer[i]; j++) {
+                for (j = 0; j < numLayer[i]; j++) {
                     Node node = new Node();
                     layerNodes[i].Add(node);
                     nodes.Add(node);
                 }
             }
 
-            for (i = 0; i < ml-1; i++) {
+            for (i = 0; i < maxLayer - 1; i++) {
                 int fi = 0, ni = 0;
                 do {
                     Node.Conect(layerNodes[i][fi], layerNodes[i + 1][ni]);
                     NextLine(ref fi, layerNodes[i].Count, ref ni, layerNodes[i + 1].Count);
-                    
+
                 } while (!Node.CheckAllConect(layerNodes[i], layerNodes[i + 1]));
             }
 
-            for (i = 0; i < ml; i++) {
+            for (i = 0; i < maxLayer; i++) {
                 for (j = 0; j < numLayer[i]; j++) {
                     layerNodes[i][j].Position = new Vector3(j - ((float)layerNodes[i].Count / 2), i);
                 }
@@ -62,21 +75,21 @@ namespace YubPack.Roguelike {
 
         }
 
-        private void Making() {
-
-
+        public void making(Guid guid) {
+            this.guid = guid;
+            making();
         }
 
-        private void IncreaseNode(int layer) {
-            
+        public void making(string str) {
+            this.guid = new Guid(str);
+            making();
         }
 
-        private void DecreaseNode(int layer) {
-
-        }
-
-        private void KeepNode(int layer) {
-
+        public void randomPosition() {
+            foreach (Node node in nodes) {
+                Vector3 vec = Random.insideUnitCircle;
+                node.Position += vec * 0.2f;
+            }
         }
 
         private void NextLine(ref int fi, int maxfi, ref int ni, int maxni) {
@@ -101,19 +114,19 @@ namespace YubPack.Roguelike {
 
         public List<Vector3> GetVector3s() {
             List<Vector3> vector3s = new List<Vector3>();
-            
-            foreach(Node node in nodes) {
+
+            foreach (Node node in nodes) {
                 vector3s.Add(node.Position);
             }
-            
+
             return vector3s;
         }
 
         public List<(Vector3, Vector3)> GetLines() {
             List<(Vector3, Vector3)> lines = new List<(Vector3, Vector3)>();
 
-            foreach(Node node in nodes) {
-                foreach(Node next in node.GetNexts()) {
+            foreach (Node node in nodes) {
+                foreach (Node next in node.GetNexts()) {
                     lines.Add((node.Position, next.Position));
                 }
             }
@@ -130,7 +143,7 @@ namespace YubPack.Roguelike {
             private Vector3 position;
             private List<Node> nextNodes;
             private List<Node> prevNodes;
-        
+
             public Node() {
                 eventCode = 0;
                 nextNodes = new List<Node>();
@@ -140,7 +153,7 @@ namespace YubPack.Roguelike {
             public void AddNextNode(Node next) {
                 nextNodes.Add(next);
             }
-            
+
             public int NextCount {
                 get { return nextNodes.Count; }
             }

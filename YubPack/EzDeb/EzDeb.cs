@@ -48,4 +48,63 @@ namespace YubPack.EzDebug {
             }
         }
     }
+
+    public class MyNums {
+        private List<int> numbers;
+
+        public MyNums() {
+            numbers = new List<int>();
+        }
+
+        public List<int> GetNumbers() {
+            return numbers;
+        }
+
+        public void Add(int number) {
+            numbers.Add(number);
+        }
+
+        public void Remove(int number) {
+            if (numbers.Contains(number)) {
+                numbers.RemoveAt(numbers.IndexOf(number));
+            }
+        }
+
+        public int Count {
+            get { return numbers.Count; }
+        }
+
+        public void Clear() {
+            numbers.Clear();
+        }
+
+        public bool Contains(int number) {
+            return numbers.Contains(number);
+        }
+
+        public int Sum() {
+            int sum = 0;
+            for (int i = 0; i < numbers.Count; i++) {
+                sum += numbers[i];
+            }
+            return sum;
+        }
+
+        public float Average() {
+            return (float)Sum() / numbers.Count;
+        }
+    }
+
+    public class UIConsole {
+        [SerializeField] private GameObject TextBox;
+        private string a;
+
+        public UIConsole() {
+
+        }
+
+        public void add(string a) {
+
+        }
+    }
 }
