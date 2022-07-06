@@ -136,7 +136,6 @@ namespace YubPack.Roguelike {
 
     }
 
-
     namespace Components {
         public class Node {
             private int eventCode;
