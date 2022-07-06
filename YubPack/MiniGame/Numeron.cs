@@ -10,7 +10,7 @@ namespace YubPack.MiniGame.Numeron
         {
             get
             {
-                for
+                return 123;
             }
         }
 
