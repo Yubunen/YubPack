@@ -1,39 +1,89 @@
 namespace YubPack.MiniGame.Numeron
 {
+    using System.Collections.Generic;
     using UnityEngine;
 
-    public class ComPlayer
+    public class Numeron
     {
-        private int[] code;
-        
-        public int Code
+        private int digit = 3;
+        private int[] num;
+
+        public Numeron()
         {
-            get
+            num = new int[digit];
+            GenerateNumber();
+            Debug.Log("" + num[0] + num[1] + num[2]);
+        }
+
+        private void GenerateNumber()
+        {
+            List<int> list = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            for (int i = 0; i < digit; i++)
             {
-                return 123;
+                int index = Random.Range(0, list.Count);
+                num[i] = list[index];
+                list.RemoveAt(index);
             }
         }
 
-        public ComPlayer(int digits = 3)
+        public (int hit, int brow) CheckAns(int n)
         {
-            code = new int[digits];
-            GenerateCode();
+            int[] na = new int[digit];
+            for (int i = digit - 1; i >= 0; i--)
+            {
+                na[i] = n % 10;
+                n /= 10;
+            }
+            return CheckAns(na);
         }
 
-        private void GenerateCode()
+        public (int hit, int brow) CheckAns(int[] n)
         {
-            int[] vs = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-            for (int i = 0; i < vs.Length; i++)
+            return (CheckHit(n), CheckBrow(n));
+        }
+
+        private bool CheckN(int[] n)
+        {
+            //Checking input nunber.
+            return true;
+        }
+
+        public int CheckHit(int[] n)
+        {
+            int count = 0;
+            for (int i = 0; i < digit; i++)
             {
-                int ind = Random.Range(0, 10);
-                int tmp = vs[i];
-                vs[i] = vs[ind];
-                vs[ind] = tmp;
+                if (n[i] == num[i])
+                {
+                    count++;
+                }
             }
-            for(int i = 0; i < code.Length; i++)
+            return count;
+        }
+
+        public int CheckBrow(int[] n)
+        {
+            int count = 0;
+            for (int i = 0; i < digit; i++)
             {
-                code[i] = vs[i];
+                if (n[i] == num[(i + 1) % 3] || n[i] == num[(i + 2) % 3])
+                {
+                    count++;
+                }
             }
+            return count;
+        }
+
+        public int GetAns()
+        {
+            int res = 0;
+            for (int i = 0; i < digit; i++)
+            {
+                res *= 10;
+                res += num[i];
+            }
+            return res;
         }
     }
+
 }
